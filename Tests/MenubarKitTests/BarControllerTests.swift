@@ -156,11 +156,51 @@ import Testing
         #expect(items.log.suffix(2) == ["repair", "hide"])
     }
 
-    @Test func aDividerOnTheLeftOfTheArrowIsNotMadeAgain() {
+    @Test func aDividerThatTouchesTheArrowIsNotMadeAgain() {
         let controller = makeHiddenController()
         controller.toggle()
         controller.toggle()
         #expect(!items.log.contains("repair"))
+    }
+
+    // S16, S42: the user dropped an icon directly on the left of the arrow, and macOS put it on the right of the divider.
+    @Test func anIconBetweenTheDividerAndTheArrowIsHiddenToo() {
+        let controller = makeHiddenController()
+        controller.toggle()
+        // An icon of 38 points is between the divider and the arrow.
+        items.dividerFrame = CGRect(x: 1183, y: 1084, width: 24, height: 33)
+
+        controller.toggle()
+        #expect(items.log.suffix(2) == ["repair", "hide"])
+
+        // The new divider is directly on the left of the arrow. The icon is on its left now.
+        world.hiddenCount = 14
+        items.dividerFrame = CGRect(x: -3771, y: 1084, width: 5016, height: 33)
+        clock.advance(by: 2)
+        #expect(items.isHidden == true)
+        // The user put the icon there. It is not a new icon, so the arrow shows no dot.
+        #expect(items.hasDot == false)
+        #expect(clock.pendingCount == 0)
+
+        // The count of the repair is the highest count now. Only one more icon is a new icon.
+        launchAnApp()
+        #expect(items.hasDot == false)
+        world.hiddenCount = 15
+        launchAnApp()
+        #expect(items.hasDot == true)
+    }
+
+    // The number of a different icon can keep it between them. The arrow is on the screen, so the icons stay hidden.
+    @Test func theIconsStayHiddenWhenAnIconIsStillBetweenAfterTheRepair() {
+        let controller = makeHiddenController()
+        controller.toggle()
+        items.dividerFrame = CGRect(x: 1183, y: 1084, width: 24, height: 33)
+        controller.toggle()
+
+        items.dividerFrame = CGRect(x: -3809, y: 1084, width: 5016, height: 33)
+        clock.advance(by: 2)
+        #expect(items.isHidden == true)
+        #expect(clock.pendingCount == 0)
     }
 
     // The frames are not correct directly after the start. The controller must not repair from wrong frames.
