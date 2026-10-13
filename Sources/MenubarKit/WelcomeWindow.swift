@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// The content of the welcome window: how the user selects the hidden icons (decisions 10 and 12).
+/// The content of the welcome window: how the user selects the hidden icons.
 struct WelcomeView: View {
     static let titleText = "How to hide an icon"
     /// One sentence on each line.
@@ -19,7 +19,8 @@ struct WelcomeView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(WelcomeView.titleText).font(.title2).bold()
-            MenuBarDrawing().frame(maxWidth: .infinity)
+            // VoiceOver would read the name of each symbol. The lines of text below tell the same as the drawing.
+            MenuBarDrawing().frame(maxWidth: .infinity).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 4) {
                 ForEach(WelcomeView.bodyLines, id: \.self) { Text($0) }
             }

@@ -2,7 +2,7 @@ import AppKit
 import Carbon.HIToolbox
 import SwiftUI
 
-/// The three rows of the settings window (decision 9).
+/// The three rows of the settings window: open at login, the delay, and the hotkey.
 struct SettingsView: View {
     @ObservedObject var model: SettingsModel
 
