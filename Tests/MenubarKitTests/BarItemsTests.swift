@@ -51,13 +51,19 @@ import Testing
         // The dot needs room on the right of the arrow.
         #expect(hiddenWithDot.size.width > hidden.size.width)
 
-        // The direction: the pixels are those of the system symbol.
-        func pixels(_ symbol: String) -> Data? {
-            NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?.tiffRepresentation
+        // The direction: the pixels are those of the system symbol, in the look of the arrow.
+        func pixels(_ symbol: String, plain: Bool = false) -> Data? {
+            let image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)
+            return (plain ? image : image?.withSymbolConfiguration(BarItems.arrowStyle))?.tiffRepresentation
         }
         #expect(pixels("chevron.left") != pixels("chevron.right"))
         #expect(hidden.tiffRepresentation == pixels("chevron.left"))
         #expect(shown.tiffRepresentation == pixels("chevron.right"))
+
+        // The plain system arrow is thin and easy to miss. The arrow of the app is heavier and larger.
+        let plain = try #require(NSImage(systemSymbolName: "chevron.left", accessibilityDescription: nil))
+        #expect(hidden.tiffRepresentation != pixels("chevron.left", plain: true))
+        #expect(hidden.size.width > plain.size.width && hidden.size.height > plain.size.height)
     }
 
     // S41: the user sees only the arrow. The divider is the hide method, and it shows nothing in each state.

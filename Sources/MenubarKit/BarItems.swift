@@ -151,10 +151,14 @@ import AppKit
 
     // MARK: The images
 
+    /// The plain system arrow is thin and easy to miss between the other icons. This one is heavier and a little larger.
+    static let arrowStyle = NSImage.SymbolConfiguration(pointSize: 16, weight: .heavy)
+
     static func arrowImage(pointsLeft: Bool, hasDot: Bool) -> NSImage? {
         let name = pointsLeft ? "chevron.left" : "chevron.right"
         let text = !pointsLeft ? "Hide the icons" : hasDot ? "Show the hidden icons. A new icon is hidden." : "Show the hidden icons"
-        guard let chevron = NSImage(systemSymbolName: name, accessibilityDescription: text) else { return nil }
+        guard let chevron = NSImage(systemSymbolName: name, accessibilityDescription: text)?
+            .withSymbolConfiguration(arrowStyle) else { return nil }
         guard hasDot else { return chevron }
 
         // The same arrow with a small dot at the top right.
