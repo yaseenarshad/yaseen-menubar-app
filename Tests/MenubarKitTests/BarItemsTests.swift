@@ -50,6 +50,14 @@ import Testing
         #expect(Set(descriptions).count == 3)
         // The dot needs room on the right of the arrow.
         #expect(hiddenWithDot.size.width > hidden.size.width)
+
+        // The direction: the pixels are those of the system symbol.
+        func pixels(_ symbol: String) -> Data? {
+            NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?.tiffRepresentation
+        }
+        #expect(pixels("chevron.left") != pixels("chevron.right"))
+        #expect(hidden.tiffRepresentation == pixels("chevron.left"))
+        #expect(shown.tiffRepresentation == pixels("chevron.right"))
     }
 
     // S3
