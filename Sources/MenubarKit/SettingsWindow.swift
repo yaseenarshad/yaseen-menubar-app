@@ -70,7 +70,8 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private let model: SettingsModel
     private let window: NSWindow
     private let present: @MainActor (NSWindow) -> Void
-    private var keyMonitor: Any?
+    /// Not `nil` only while the window is open.
+    private(set) var keyMonitor: Any?
 
     /// A test gives its own `present`, so no window comes on the screen.
     init(model: SettingsModel, present: @escaping @MainActor (NSWindow) -> Void = { $0.showInFront() }) {
@@ -94,17 +95,6 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         host.sizingOptions = [.preferredContentSize]
         window.contentViewController = host
         window.center()
-
-        // A monitor sees a key before the window does. Thus the field also gets a combination with Command,
-        // which the window would handle as a key equivalent.
-        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            // Only plain values cross into the main actor: `NSEvent` is not `Sendable`.
-            guard let combo = HotKeyCombo(keyDown: event) else { return event }
-            let windowNumber = event.windowNumber
-            let used = MainActor.assumeIsolated { self?.keyDown(combo, windowNumber: windowNumber) ?? false }
-            // `nil` tells AppKit that the key is used.
-            return used ? nil : event
-        }
     }
 
     deinit {
@@ -114,7 +104,22 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     /// Shows the window in front of other apps. A second call shows the same window.
     func show() {
         model.refreshOpenAtLogin()
+        addKeyMonitor()
         present(window)
+    }
+
+    /// A monitor sees a key before the window does. Thus the field also gets a combination with Command,
+    /// which the window would handle as a key equivalent.
+    private func addKeyMonitor() {
+        guard keyMonitor == nil else { return }
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            // Only plain values cross into the main actor: `NSEvent` is not `Sendable`.
+            guard let combo = HotKeyCombo(keyDown: event) else { return event }
+            let windowNumber = event.windowNumber
+            let used = MainActor.assumeIsolated { self?.keyDown(combo, windowNumber: windowNumber) ?? false }
+            // `nil` tells AppKit that the key is used.
+            return used ? nil : event
+        }
     }
 
     /// Returns `true` when the key is used.
@@ -138,6 +143,9 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         model.cancelRecording()
+        // The app keeps this controller. A closed window must not leave a monitor behind.
+        if let keyMonitor = keyMonitor { NSEvent.removeMonitor(keyMonitor) }
+        keyMonitor = nil
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
