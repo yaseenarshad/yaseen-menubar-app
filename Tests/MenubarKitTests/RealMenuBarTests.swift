@@ -9,8 +9,6 @@ import Testing
 /// It puts an arrow and a divider in the menu bar for about 3 seconds and removes them, also when a check fails.
 /// It uses no mouse and no keyboard. It prints the measured times.
 @MainActor @Suite struct RealMenuBarTests {
-    nonisolated static let isEnabled = ProcessInfo.processInfo.environment["MENUBAR_REAL_TEST"] == "1"
-
     /// Lets the run loop work until the condition is true. Returns the waited milliseconds, or `nil` after the limit.
     func wait(limit: TimeInterval = 1.5, until condition: () -> Bool) -> Double? {
         let start = Date()
@@ -26,12 +24,12 @@ import Testing
         return Double(duration.components.seconds) * 1000 + Double(duration.components.attoseconds) / 1e15
     }
 
-    @Test(.enabled(if: RealMenuBarTests.isEnabled))
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["MENUBAR_REAL_TEST"] == "1"))
     func hideAndShowOnTheRealMenuBar() throws {
         NSApplication.shared.setActivationPolicy(.accessory)
 
         // AppKit reads the saved positions from the standard defaults. `addSuite` lets it see the suite of this test.
-        // The name is fixed, so many runs leave at most one file. The test deletes the file at its end.
+        // The name is fixed: macOS keeps an empty file of 42 bytes for a suite, and many runs then leave one file.
         let suiteName = "com.yaseenarshad.yaseenmenubar.realtest"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defaults.removePersistentDomain(forName: suiteName)
@@ -39,8 +37,6 @@ import Testing
         defer {
             UserDefaults.standard.removeSuite(named: suiteName)
             defaults.removePersistentDomain(forName: suiteName)
-            let file = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Preferences/\(suiteName).plist")
-            try? FileManager.default.removeItem(at: file)
             // AppKit copies the two positions into the defaults of the test runner.
             UserDefaults.standard.removeObject(forKey: "NSStatusItem Preferred Position YMArrow")
             UserDefaults.standard.removeObject(forKey: "NSStatusItem Preferred Position YMDivider")
@@ -108,6 +104,13 @@ import Testing
         let showFrameTime = try #require(wait { items.dividerFrame == thin })
         #expect(items.arrowFrame == arrow)
 
+        // S17: the repair makes the divider again, directly on the left of the arrow.
+        items.putDividerLeftOfArrow()
+        items.render(BarModel())
+        let repairTime = try #require(wait { items.dividerFrame == thin })
+        #expect(items.arrowFrame == arrow)
+        #expect(defaults.double(forKey: "NSStatusItem Preferred Position YMDivider") == 430)
+
         // A click must change the menu bar in less than one frame of the display.
         #expect(hideTime < 16)
         #expect(showTime < 16)
@@ -117,6 +120,8 @@ import Testing
         hidden icons \(thinCount) (thin) and \(stretchedCount) (stretched)
         REAL MENU BAR: hide \(String(format: "%.2f", hideTime)) ms, show \(String(format: "%.2f", showTime)) ms, \
         divider frame moved after \(Int(hideFrameTime)) ms (hide) and \(Int(showFrameTime)) ms (show)
+        REAL MENU BAR: divider made again in \(Int(repairTime)) ms, \
+        menu open: \(AutoHide.menuIsOpen()), pointer in a menu bar: \(AutoHide.pointerIsInMenuBar())
         """)
     }
 }
