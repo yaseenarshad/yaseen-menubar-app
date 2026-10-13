@@ -1,6 +1,6 @@
 import AppKit
 
-/// The menu that a right-click on the arrow opens (decision 9).
+/// The menu that a right-click on the arrow opens.
 @MainActor
 final class ArrowMenu: NSObject {
     var onSettings: () -> Void = {}

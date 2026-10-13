@@ -6,7 +6,7 @@ import Testing
 ///
 ///     MENUBAR_REAL_TEST=1 swift test --filter RealMenuBarTests
 ///
-/// It puts an arrow and a divider in the menu bar for about 3 seconds and removes them, also when a check fails.
+/// It puts an arrow and a divider in the menu bar for about 2 seconds and removes them, also when a check fails.
 /// It uses no mouse and no keyboard. It prints the measured times.
 @MainActor @Suite struct RealMenuBarTests {
     /// Lets the run loop work until the condition is true. Returns the waited milliseconds, or `nil` after the limit.

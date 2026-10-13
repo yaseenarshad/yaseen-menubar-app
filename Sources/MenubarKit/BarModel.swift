@@ -65,7 +65,7 @@ public enum BarLayout {
     }
 
     /// True when a frame of a status item is correct: its top is the top of a screen and a part of it is on that screen.
-    /// A new status item has a wrong frame for about 150 ms (YAZ-2799).
+    /// A new status item has a wrong frame for about 150 ms.
     static func isInMenuBar(_ frame: CGRect, screenFrames: [CGRect]) -> Bool {
         screenFrames.contains { screen in
             frame.height > 0 && abs(frame.maxY - screen.maxY) < 1 && frame.maxX > screen.minX && frame.minX < screen.maxX
