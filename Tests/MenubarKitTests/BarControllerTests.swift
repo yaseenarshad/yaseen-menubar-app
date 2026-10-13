@@ -206,6 +206,18 @@ import Testing
         items.dividerFrame = CGRect(x: -3745, y: 1084, width: 5016, height: 33)
         clock.advance(by: 2)
         #expect(items.isHidden == false)
+
+        // The delay must not hide again: each hide would remove and make the divider one more time.
+        #expect(clock.pendingCount == 0)
+        clock.advance(by: 3600)
+        #expect(items.isHidden == false)
+        #expect(items.log.filter { $0 == "repair" }.count == 1)
+
+        // A click tries again.
+        items.dividerFrame = CGRect(x: 1271, y: 1084, width: 24, height: 33)
+        items.arrowFrame = CGRect(x: 1245, y: 1084, width: 26, height: 33)
+        controller.toggle()
+        #expect(items.log.suffix(2) == ["repair", "hide"])
     }
 
     @Test func theIconsStayHiddenWhenTheRepairWorked() {
@@ -335,6 +347,25 @@ import Testing
         #expect(clock.pendingCount == 0)
     }
 
+    // The welcome window is open and the user clicks the arrow, or presses the hotkey.
+    @Test func aClickWorksWhileHoldsOpenIsTrue() {
+        let controller = makeHiddenController()
+        controller.holdsOpen = true
+
+        controller.toggle()
+        #expect(items.isHidden == true)
+        controller.toggle()
+        #expect(items.isHidden == false)
+        // The icons that the user showed stay too: still no delay.
+        #expect(clock.pendingCount == 0)
+
+        // The window closes while the icons are hidden. They stay hidden, and nothing waits.
+        controller.toggle()
+        controller.holdsOpen = false
+        #expect(items.isHidden == true)
+        #expect(clock.pendingCount == 0)
+    }
+
     @Test func aStartWithHoldsOpenShowsTheIcons() {
         let controller = makeController()
         controller.holdsOpen = true
@@ -380,6 +411,8 @@ import Testing
     // S24
     @Test func appsThatStartInTheFirstMinuteGiveNoDot() {
         let controller = makeController()
+        // The real clock is the time since the Mac started, not the time since this app started.
+        clock.advance(by: 5000)
         controller.start(hidden: true)
         clock.advance(by: 20)
         world.hiddenCount = 20
