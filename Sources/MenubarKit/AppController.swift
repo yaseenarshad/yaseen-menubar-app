@@ -1,12 +1,19 @@
 import AppKit
 
-/// The app. It starts with no Dock icon, puts the arrow in the menu bar, and stays open.
+/// The app. It starts with no Dock icon, puts the arrow in the menu bar, and joins the parts.
 @MainActor
 public final class AppController: NSObject, NSApplicationDelegate {
     /// The same value as `CFBundleIdentifier` in `Support/Info.plist`. A test compares the two.
     public nonisolated static let bundleIdentifier = "com.yaseenarshad.yaseenmenubar"
 
+    /// The menu rows hold the menu object as a weak target, so the app keeps it.
+    let menu = ArrowMenu()
+    private(set) var settings: SettingsModel?
+
     private var bar: BarController?
+    private var welcome: WelcomeWindowController?
+    private var settingsWindow: SettingsWindowController?
+    private let hotKeys = HotKeyCenter()
 
     public func applicationDidFinishLaunching(_ notification: Notification) {
         // Two copies would put two arrows in the menu bar.
@@ -14,9 +21,52 @@ public final class AppController: NSObject, NSApplicationDelegate {
             NSApp.terminate(nil)
             return
         }
+        let store = SettingsStore(defaults: .standard)
         let bar = BarController()
-        bar.start(hidden: true)
+        // The hotkey does the same as a click on the arrow.
+        hotKeys.onHotKey = { [weak bar] in MainActor.assumeIsolated { bar?.toggle() } }
+        start(
+            bar: bar,
+            store: store,
+            settings: SettingsModel(store: store, hotKeys: hotKeys, loginItem: SystemLoginItem()),
+            welcome: WelcomeWindowController()
+        )
+    }
+
+    /// Joins the parts and starts the bar. A test calls this with fake parts.
+    func start(bar: BarController, store: SettingsStore, settings: SettingsModel, welcome: WelcomeWindowController) {
         self.bar = bar
+        self.settings = settings
+        self.welcome = welcome
+
+        bar.hideAfterSeconds = settings.hideAfterSeconds
+        settings.onHideAfterChanged = { [weak bar] in bar?.hideAfterSeconds = $0 }
+        settings.registerHotKey()
+        settings.registerLoginItemAtFirstStart()
+
+        menu.onSettings = { [weak self] in self?.showSettings() }
+        menu.onHowTo = { [weak welcome] in welcome?.show() }
+        menu.onQuit = { NSApp.terminate(nil) }
+        bar.menu = menu.menu
+
+        // The icons stay shown while the welcome window is open. The user needs them to drag.
+        welcome.onOpen = { [weak bar] in bar?.holdsOpen = true }
+        welcome.onClose = { [weak bar] in bar?.holdsOpen = false }
+
+        if store.didFirstStart {
+            bar.start(hidden: true)
+        } else {
+            welcome.show()
+            bar.start(hidden: false)
+            store.didFirstStart = true
+        }
+    }
+
+    /// The window is made at the first "Settings…" and kept, so there is never a second one.
+    private func showSettings() {
+        guard let settings = settings else { return }
+        if settingsWindow == nil { settingsWindow = SettingsWindowController(model: settings) }
+        settingsWindow?.show()
     }
 
     /// True when a copy of the app with the same bundle identifier started before this one.
