@@ -56,4 +56,26 @@ public enum BarLayout {
     public static func hiddenCount(iconFrames: [CGRect], dividerMinX: CGFloat) -> Int {
         iconFrames.filter { $0.maxX <= dividerMinX }.count
     }
+
+    /// The menu bar of a screen, in screen points. The top edge of the screen is in the band.
+    static func menuBarBand(screenFrame: CGRect, visibleFrame: CGRect, statusBarThickness: CGFloat) -> CGRect {
+        // A menu bar that hides itself takes no room from the visible frame.
+        let height = max(screenFrame.maxY - visibleFrame.maxY, statusBarThickness)
+        return CGRect(x: screenFrame.minX, y: screenFrame.maxY - height, width: screenFrame.width, height: height + 1)
+    }
+
+    /// True when a frame of a status item is correct: its top is the top of a screen and a part of it is on that screen.
+    /// A new status item has a wrong frame for about 150 ms (YAZ-2799).
+    static func isInMenuBar(_ frame: CGRect, screenFrames: [CGRect]) -> Bool {
+        screenFrames.contains { screen in
+            frame.height > 0 && abs(frame.maxY - screen.maxY) < 1 && frame.maxX > screen.minX && frame.minX < screen.maxX
+        }
+    }
+
+    /// The window frames with the same top and the same height as the divider. These are the icons of its menu bar.
+    /// The window frames come from the window list: the zero is at the top of the main screen, and y grows down.
+    static func frames(_ windowFrames: [CGRect], inBandOf dividerFrame: CGRect, mainScreenHeight: CGFloat) -> [CGRect] {
+        let top = mainScreenHeight - dividerFrame.maxY
+        return windowFrames.filter { abs($0.minY - top) < 1 && abs($0.height - dividerFrame.height) < 1 }
+    }
 }
