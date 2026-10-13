@@ -7,7 +7,7 @@ import Carbon.HIToolbox
 /// and asks macOS for "open at login". The app and the window only call it. Thus a test proves the rules.
 @MainActor
 final class SettingsModel: ObservableObject {
-    static let shortcutInUseText = "That shortcut is in use."
+    static let hotKeyInUseText = "That hotkey is in use."
     static let loginItemNotAvailableText = "Open at login works only in the installed app."
     static let loginItemNotChangedText = "macOS did not change this setting. Look at Login Items in System Settings."
 
@@ -60,15 +60,15 @@ final class SettingsModel: ObservableObject {
 
     /// The text on the hotkey field.
     var hotKeyText: String {
-        if isRecording { return "Type a shortcut" }
-        return hotKey?.text ?? "Record shortcut"
+        if isRecording { return "Type a hotkey" }
+        return hotKey?.text ?? "Record hotkey"
     }
 
     /// Registers the stored hotkey, if there is one. The app calls this at the start.
     /// When macOS refuses, the app continues to run and the window shows the red line.
     func registerHotKey() {
         guard let hotKey = hotKey else { return }
-        hotKeyProblem = hotKeys.register(hotKey) ? nil : SettingsModel.shortcutInUseText
+        hotKeyProblem = hotKeys.register(hotKey) ? nil : SettingsModel.hotKeyInUseText
     }
 
     func startRecording() {
@@ -104,7 +104,7 @@ final class SettingsModel: ObservableObject {
         } else {
             // The failed call left no hotkey registered. Put the earlier one back.
             registerHotKey()
-            hotKeyProblem = SettingsModel.shortcutInUseText
+            hotKeyProblem = SettingsModel.hotKeyInUseText
         }
         return true
     }

@@ -24,7 +24,7 @@ A small menu bar manager for the Mac. It hides menu bar icons and shows them wit
 
 - The app owns two menu bar icons: the arrow and a thin divider on its left.
 - To hide, the app makes the divider 10,000 points long. macOS then pushes each icon on the left of the divider off the screen.
-- A left click on the arrow shows the icons. They hide again after a delay, 10 seconds by default. The app waits while the pointer is in the menu bar or a menu is open.
+- A left click on the arrow shows the icons. They hide again after a delay, 10 seconds by default. The app waits while the pointer is in the menu bar or a menu is open. An open menu holds the icons for one minute at most.
 - A dot on the arrow tells that a new icon landed on the hidden side.
 - When the app quits or stops, macOS removes the divider and all icons come back.
 - While the icons are hidden, the app runs no timer and watches no input. There is one exception: after an app starts, this app waits 2 seconds one time and then counts the hidden icons.
