@@ -60,9 +60,6 @@ import AppKit
     func render(_ model: BarModel) {
         if model.dividerLength != writtenLength {
             divider.length = model.dividerLength
-            // A stretched divider shows no line. Its middle can be on the screen of a wide display.
-            let line = model.isHidden ? nil : BarItems.lineImage
-            if divider.button?.image !== line { divider.button?.image = line }
             writtenLength = model.dividerLength
         }
         let look = ArrowLook(pointsLeft: model.isHidden, hasDot: model.hasNewIcon)
@@ -88,8 +85,8 @@ import AppKit
     // MARK: The divider
 
     private static func makeDivider() -> NSStatusItem {
-        // The start length is 1. With 0, macOS makes no real window. `render` writes the real length.
-        let divider = NSStatusBar.system.statusItem(withLength: 1)
+        // The divider shows no image and no title: the user sees only the arrow. `render` writes the real length.
+        let divider = NSStatusBar.system.statusItem(withLength: DividerLength.start)
         divider.autosaveName = dividerName
         return divider
     }
@@ -173,16 +170,4 @@ import AppKit
         image.accessibilityDescription = text
         return image
     }
-
-    /// The thin line of the divider.
-    private static let lineImage: NSImage = {
-        let image = NSImage(size: NSSize(width: 1, height: 12), flipped: false) { rect in
-            NSColor.black.withAlphaComponent(0.4).setFill()
-            rect.fill()
-            return true
-        }
-        image.isTemplate = true
-        image.accessibilityDescription = "Divider. The icons on its left hide."
-        return image
-    }()
 }

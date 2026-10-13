@@ -20,7 +20,16 @@ import Testing
 
         model.show()
         #expect(!model.isHidden)
-        #expect(model.dividerLength == 8)
+        #expect(model.dividerLength == 1)
+    }
+
+    // S41: the thin divider is as narrow as macOS permits. Length 1 gives a real width of 17 points.
+    // S37: with a start length of 0, macOS makes no real window. The first write must also be a different length.
+    @Test func aNewDividerStartsWithALengthThatIsNotZeroAndNotAStateLength() {
+        #expect(DividerLength.thin == 1)
+        #expect(DividerLength.start > 0)
+        #expect(DividerLength.start != DividerLength.thin)
+        #expect(DividerLength.start != DividerLength.stretched)
     }
 
     // S21, S22
@@ -84,6 +93,23 @@ import Testing
         #expect(BarLayout.dividerIsLeftOfArrow(dividerFrame: icon(1365, width: 24), arrowFrame: arrow))
         #expect(BarLayout.dividerIsLeftOfArrow(dividerFrame: icon(-3627, width: 5016), arrowFrame: arrow))
         #expect(!BarLayout.dividerIsLeftOfArrow(dividerFrame: icon(1427, width: 24), arrowFrame: arrow))
+    }
+
+    // S16, S42: the app keeps the divider directly on the left of the arrow. The user sees only the arrow.
+    @Test func theDividerMustTouchTheArrow() {
+        let arrow = icon(1389, width: 26)
+        #expect(BarLayout.dividerTouchesArrow(dividerFrame: icon(1372, width: 17), arrowFrame: arrow))
+        // One point of difference is not an icon.
+        #expect(BarLayout.dividerTouchesArrow(dividerFrame: icon(1371, width: 17), arrowFrame: arrow))
+        #expect(BarLayout.dividerTouchesArrow(dividerFrame: icon(1373, width: 17), arrowFrame: arrow))
+        #expect(!BarLayout.dividerTouchesArrow(dividerFrame: icon(1370, width: 17), arrowFrame: arrow))
+        // An icon is between them.
+        #expect(!BarLayout.dividerTouchesArrow(dividerFrame: icon(1334, width: 17), arrowFrame: arrow))
+        // S17: the divider is on the right of the arrow, also directly next to it.
+        #expect(!BarLayout.dividerTouchesArrow(dividerFrame: icon(1415, width: 17), arrowFrame: arrow))
+        #expect(!BarLayout.dividerTouchesArrow(dividerFrame: icon(1453, width: 17), arrowFrame: arrow))
+        // A stretched divider ends at the arrow.
+        #expect(BarLayout.dividerTouchesArrow(dividerFrame: icon(-3627, width: 5016), arrowFrame: arrow))
     }
 
     @Test func hiddenCountCountsTheIconsOnTheLeftOfTheDivider() {

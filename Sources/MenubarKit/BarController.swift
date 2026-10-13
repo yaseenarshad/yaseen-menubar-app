@@ -91,8 +91,9 @@ import AppKit
         autoHide.stop()
         var count = 0
         if let divider = items.dividerFrame {
-            if let arrow = items.arrowFrame, !BarLayout.dividerIsLeftOfArrow(dividerFrame: divider, arrowFrame: arrow) {
-                // A stretched divider on the right of the arrow pushes the arrow off the screen.
+            if let arrow = items.arrowFrame, !BarLayout.dividerTouchesArrow(dividerFrame: divider, arrowFrame: arrow) {
+                // An icon between them would stay shown. A divider on the right of the arrow would push the arrow
+                // off the screen.
                 items.putDividerLeftOfArrow()
                 // The new divider has no frame yet. The check tells if the repair worked.
                 repairIsNotChecked = true
@@ -111,6 +112,7 @@ import AppKit
         guard let divider = items.dividerFrame else { return }
         let followsRepair = repairIsNotChecked
         repairIsNotChecked = false
+        // The order is the rule here, not the touch: an icon between them does not push the arrow off the screen.
         guard let arrow = items.arrowFrame, BarLayout.dividerIsLeftOfArrow(dividerFrame: divider, arrowFrame: arrow) else {
             // The divider is in the menu bar, but the arrow is not on its right. Bring the arrow back.
             // The next hide makes the divider again.
@@ -121,7 +123,14 @@ import AppKit
             }
             return
         }
-        model.appStarted(hiddenCount: hiddenIconCount(divider), secondsSinceStart: uptime() - startTime)
+        let count = hiddenIconCount(divider)
+        if followsRepair && model.isHidden {
+            // The hide with the repair had no count. The repair can move an icon of the user to the hidden side.
+            // That icon is not a new icon, so this count gives no dot.
+            model.hide(hiddenCount: count)
+        } else {
+            model.appStarted(hiddenCount: count, secondsSinceStart: uptime() - startTime)
+        }
         render()
     }
 

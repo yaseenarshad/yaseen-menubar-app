@@ -1,11 +1,14 @@
 import CoreGraphics
 
-/// The two lengths of the divider. The length is the hide method.
+/// The lengths of the divider. The length is the hide method.
 public enum DividerLength {
     /// macOS pushes each icon on the left of a divider this long off the screen.
     public static let stretched: CGFloat = 10_000
-    /// A thin divider. macOS gives it a real width of 24 points.
-    public static let thin: CGFloat = 8
+    /// The divider while the icons show. It shows nothing. macOS gives it a real width of 17 points, the minimum.
+    public static let thin: CGFloat = 1
+    /// The length of a new divider, until the first write. With 0, macOS makes no real window.
+    /// It is not a state length: in a probe, a status item that kept its start length got no real window.
+    static let start: CGFloat = 2
 }
 
 /// The state of the menu bar, with no real menu bar.
@@ -48,8 +51,15 @@ public struct BarModel: Equatable {
 /// The geometry rules of the menu bar. All frames are in screen points.
 public enum BarLayout {
     /// The frames of two icons never overlap, so the left edges tell the order.
+    /// A stretched divider on the right of the arrow pushes the arrow off the screen.
     public static func dividerIsLeftOfArrow(dividerFrame: CGRect, arrowFrame: CGRect) -> Bool {
         dividerFrame.minX < arrowFrame.minX
+    }
+
+    /// True when the right edge of the divider is the left edge of the arrow. No icon is between them then.
+    /// The frames can differ by one point.
+    public static func dividerTouchesArrow(dividerFrame: CGRect, arrowFrame: CGRect) -> Bool {
+        abs(dividerFrame.maxX - arrowFrame.minX) <= 1
     }
 
     /// The number of icons that are fully on the left of the divider.
