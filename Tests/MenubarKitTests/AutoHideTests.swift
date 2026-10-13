@@ -2,6 +2,7 @@ import Testing
 @testable import MenubarKit
 
 /// The delay that hides the icons again (YAZ-2800). A fake clock and fake checks drive it.
+/// S8 and S9 (the delay "Never", and a new delay) are in `BarControllerTests`.
 @MainActor @Suite struct AutoHideTests {
     let clock = FakeClock()
     let world = World()
@@ -29,7 +30,7 @@ import Testing
     @Test func theIconsHideWhenTheDelayEnds() {
         let autoHide = makeAutoHide()
         autoHide.start(seconds: 10)
-        #expect(autoHide.isWaiting)
+        #expect(clock.pendingCount == 1)
 
         clock.advance(by: 9.9)
         #expect(world.hideCount == 0)
@@ -38,7 +39,6 @@ import Testing
 
         clock.advance(by: 0.1)
         #expect(world.hideCount == 1)
-        #expect(!autoHide.isWaiting)
         #expect(clock.pendingCount == 0)
     }
 
@@ -50,7 +50,7 @@ import Testing
 
         clock.advance(by: 10)
         #expect(world.hideCount == 0)
-        #expect(autoHide.isWaiting)
+        #expect(clock.pendingCount == 1)
 
         // The pointer stays for a long time. The delay checks again each 2 seconds with one wait.
         clock.advance(by: 60)
@@ -81,36 +81,10 @@ import Testing
         #expect(world.hideCount == 1)
     }
 
-    // S8
-    @Test func theDelayNeverMakesNoWait() {
-        let autoHide = makeAutoHide()
-        autoHide.start(seconds: 0)
-        #expect(!autoHide.isWaiting)
-        #expect(clock.pendingCount == 0)
-
-        clock.advance(by: 3600)
-        #expect(world.hideCount == 0)
-    }
-
-    // S9
-    @Test func aNewStartReplacesTheOldWait() {
-        let autoHide = makeAutoHide()
-        autoHide.start(seconds: 10)
-        clock.advance(by: 4)
-        autoHide.start(seconds: 30)
-        #expect(clock.pendingCount == 1)
-
-        clock.advance(by: 29.9)
-        #expect(world.hideCount == 0)
-        clock.advance(by: 0.1)
-        #expect(world.hideCount == 1)
-    }
-
     @Test func stopEndsTheWait() {
         let autoHide = makeAutoHide()
         autoHide.start(seconds: 10)
         autoHide.stop()
-        #expect(!autoHide.isWaiting)
         #expect(clock.pendingCount == 0)
 
         // Also a wait of 2 seconds for the pointer stops.

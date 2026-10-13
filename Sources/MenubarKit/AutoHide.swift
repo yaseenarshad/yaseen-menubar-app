@@ -27,8 +27,6 @@ import AppKit
         self.init(schedule: RealClock.schedule, pointerIsInMenuBar: AutoHide.pointerIsInMenuBar, menuIsOpen: AutoHide.menuIsOpen)
     }
 
-    var isWaiting: Bool { cancel != nil }
-
     /// Starts the delay again. 0 seconds is "Never": no wait.
     func start(seconds: Int) {
         stop()

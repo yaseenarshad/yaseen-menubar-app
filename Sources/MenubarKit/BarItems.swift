@@ -27,7 +27,7 @@ import AppKit
 
     var onClick: ((Bool) -> Void)?
 
-    private(set) var arrow: NSStatusItem
+    let arrow: NSStatusItem
     private(set) var divider: NSStatusItem
     private let defaults: UserDefaults
 
