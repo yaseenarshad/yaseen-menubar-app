@@ -3,6 +3,7 @@
 A small menu bar manager for the Mac. It hides menu bar icons and shows them with a click.
 
 - An arrow sits in the menu bar. A click on the arrow shows or hides the icons on its left.
+- There is one rule: an icon on the left of the arrow hides, and an icon on the right of the arrow always shows.
 - To change the group of an icon, hold Command and drag the icon across the arrow.
 - The app needs zero permissions: no Accessibility, no Screen Recording.
 - It is a native Swift app. It lives in the menu bar and has no Dock icon.
@@ -22,8 +23,9 @@ A small menu bar manager for the Mac. It hides menu bar icons and shows them wit
 
 ## How it works
 
-- The app owns two menu bar icons: the arrow and a thin divider on its left.
+- The app owns two menu bar items: the arrow, and a divider directly on its left. The divider shows nothing. You see only the arrow, and an empty gap of 17 points on its left.
 - To hide, the app makes the divider 10,000 points long. macOS then pushes each icon on the left of the divider off the screen.
+- Before each hide, the app checks that the divider touches the arrow. If an icon is between them, the app makes the divider again directly on the left of the arrow. Thus that icon hides too.
 - A left click on the arrow shows the icons. They hide again after a delay, 10 seconds by default. The app waits while the pointer is in the menu bar or a menu is open. An open menu holds the icons for one minute at most.
 - A dot on the arrow tells that a new icon landed on the hidden side.
 - When the app quits or stops, macOS removes the divider and all icons come back.
@@ -35,7 +37,6 @@ A small menu bar manager for the Mac. It hides menu bar icons and shows them wit
 - If the shown group has too many icons, the arrow itself can go behind the notch. Move icons to the hidden group, or remove an icon in System Settings > Menu Bar.
 - The app cannot name the icons of other apps. That needs a permission. Thus the dot is an estimate: it shows when the number of hidden icons is higher than before.
 - The app counts 2 seconds after an app starts. It does not see an icon that arrives later.
-- At each start, the app puts the divider directly on the left of the arrow. Thus an icon that you put between the divider and the arrow is in the hidden group after a restart. The cause: macOS deletes the saved position of the divider when the app quits while the icons are hidden.
 
 ## Build
 
@@ -43,7 +44,7 @@ You need Xcode. The package has no outside dependency.
 
 - `swift build`: build the app for development.
 - `swift test`: run the unit tests.
-- `MENUBAR_REAL_TEST=1 swift test --filter RealMenuBarTests`: run the one test with the real menu bar. It adds two icons for about 2 seconds and removes them. It uses no mouse and no keyboard. It leaves two empty files in `~/Library/Preferences`: `com.yaseenarshad.yaseenmenubar.realtest.plist` and `swiftpm-testing-helper.plist`.
+- `MENUBAR_REAL_TEST=1 swift test --filter RealMenuBarTests`: run the one test with the real menu bar. It adds three icons for about 4 seconds and removes them. It uses no mouse and no keyboard. It leaves two empty files in `~/Library/Preferences`: `com.yaseenarshad.yaseenmenubar.realtest.plist` and `swiftpm-testing-helper.plist`.
 - `MENUBAR_UI_PNG_DIR=<folder> swift test --filter WindowPictureTests`: write pictures of the two windows into the folder. No window comes on the screen.
 - `scripts/bundle.sh`: make `build/Yaseen Menubar.app` from a release build and sign it.
 - `scripts/bundle.sh --dmg`: also make `build/Yaseen-Menubar-<version>-arm64.dmg`.
