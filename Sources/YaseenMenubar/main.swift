@@ -1,0 +1,3 @@
+import MenubarKit
+
+AppController.main()
