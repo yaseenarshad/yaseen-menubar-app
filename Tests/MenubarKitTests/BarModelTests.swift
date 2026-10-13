@@ -20,7 +20,16 @@ import Testing
 
         model.show()
         #expect(!model.isHidden)
-        #expect(model.dividerLength == 8)
+        #expect(model.dividerLength == 1)
+    }
+
+    // S41: the thin divider is as narrow as macOS permits. Length 1 gives a real width of 17 points.
+    // S37: with a start length of 0, macOS makes no real window. The first write must also be a different length.
+    @Test func aNewDividerStartsWithALengthThatIsNotZeroAndNotAStateLength() {
+        #expect(DividerLength.thin == 1)
+        #expect(DividerLength.start > 0)
+        #expect(DividerLength.start != DividerLength.thin)
+        #expect(DividerLength.start != DividerLength.stretched)
     }
 
     // S21, S22

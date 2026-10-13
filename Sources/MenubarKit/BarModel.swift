@@ -1,11 +1,14 @@
 import CoreGraphics
 
-/// The two lengths of the divider. The length is the hide method.
+/// The lengths of the divider. The length is the hide method.
 public enum DividerLength {
     /// macOS pushes each icon on the left of a divider this long off the screen.
     public static let stretched: CGFloat = 10_000
-    /// A thin divider. macOS gives it a real width of 24 points.
-    public static let thin: CGFloat = 8
+    /// The divider while the icons show. It shows nothing. macOS gives it a real width of 17 points, the minimum.
+    public static let thin: CGFloat = 1
+    /// The length of a new divider, until the first write. With 0, macOS makes no real window.
+    /// It is not a state length: in a probe, a status item that kept its start length got no real window.
+    static let start: CGFloat = 2
 }
 
 /// The state of the menu bar, with no real menu bar.

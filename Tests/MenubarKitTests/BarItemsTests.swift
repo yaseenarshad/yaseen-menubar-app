@@ -60,6 +60,15 @@ import Testing
         #expect(shown.tiffRepresentation == pixels("chevron.right"))
     }
 
+    // S41: the user sees only the arrow. The divider is the hide method, and it shows nothing in each state.
+    // A test cannot make a real status item, so this one reads the code. The real-menu-bar test checks the real button.
+    @Test func theDividerGetsNoImageAndNoTitle() throws {
+        let source = try #require(try SourceRulesTests.sources().first { $0.name == "BarItems.swift" })
+        #expect(source.text.contains("divider.length"))
+        #expect(!source.text.contains("divider.button"))
+        #expect(!source.text.contains("lineImage"))
+    }
+
     // S3
     @Test func aRightClickAndAControlClickAreSecondary() {
         #expect(BarItems.isSecondaryClick(type: .rightMouseUp, modifiers: []))
