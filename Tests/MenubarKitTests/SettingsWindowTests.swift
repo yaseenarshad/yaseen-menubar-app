@@ -22,18 +22,28 @@ import Testing
         #expect(presented[0] === presented[1])
         #expect(model.openAtLogin == true)
         #expect(presented[0].title == "Yaseen Menubar settings")
+        presented[0].close()
     }
 
-    @Test func aRecordingStopsWhenTheWindowCloses() {
+    // The app keeps the controller. A closed window must leave no key monitor and no recording.
+    @Test func aClosedWindowStopsTheRecordingAndTheKeyMonitor() {
         let hotKeys = FakeHotKeys()
         let model = SettingsModel(store: SettingsStore(defaults: MemoryDefaults()), hotKeys: hotKeys, loginItem: FakeLoginItem())
         var window: NSWindow?
         let controller = SettingsWindowController(model: model) { window = $0 }
+        #expect(controller.keyMonitor == nil)
         controller.show()
+        #expect(controller.keyMonitor != nil)
 
         model.startRecording()
         window?.close()
         #expect(!model.isRecording)
+        #expect(controller.keyMonitor == nil)
+
+        // The window opens again: the hotkey field gets the keys again.
+        controller.show()
+        #expect(controller.keyMonitor != nil)
+        window?.close()
     }
 
     /// The form lays out with no window. The lines for a problem make it higher.
