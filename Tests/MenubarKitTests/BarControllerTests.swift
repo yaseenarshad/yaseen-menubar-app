@@ -190,6 +190,21 @@ import Testing
         #expect(items.hasDot == true)
     }
 
+    // The user shows the icons again before the check of the repair. The check must not hide them.
+    @Test func aShowBeforeTheCheckOfTheRepairStaysShown() {
+        let controller = makeHiddenController()
+        controller.hideAfterSeconds = 0
+        controller.toggle()
+        items.dividerFrame = CGRect(x: 1183, y: 1084, width: 24, height: 33)
+        controller.toggle()
+        controller.toggle()
+
+        items.dividerFrame = CGRect(x: 1221, y: 1084, width: 24, height: 33)
+        clock.advance(by: 2)
+        #expect(items.isHidden == false)
+        #expect(items.hasDot == false)
+    }
+
     // The number of a different icon can keep it between them. The arrow is on the screen, so the icons stay hidden.
     @Test func theIconsStayHiddenWhenAnIconIsStillBetweenAfterTheRepair() {
         let controller = makeHiddenController()
