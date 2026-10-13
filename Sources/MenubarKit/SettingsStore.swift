@@ -2,14 +2,13 @@ import AppKit
 
 /// All the stored values of the app, in `UserDefaults`. The list never grows.
 ///
-/// The `UserDefaults` is a parameter, so a test uses its own suite.
+/// The `UserDefaults` is a parameter, so a test gives one that keeps its values in memory.
 /// A value that is missing or broken gives the default. The store never fails.
 public final class SettingsStore {
     private enum Key {
         static let hideAfterSeconds = "hideAfterSeconds"
         static let hotKeyCode = "hotKeyCode"
         static let hotKeyModifiers = "hotKeyModifiers"
-        static let openAtLogin = "openAtLogin"
         static let loginItemWasTried = "loginItemWasTried"
         static let didFirstStart = "didFirstStart"
     }
@@ -62,13 +61,8 @@ public final class SettingsStore {
         }
     }
 
-    /// What the user wants. The default is on. The real state is in macOS (`LoginItem.isEnabled`).
-    public var openAtLogin: Bool {
-        get { defaults.object(forKey: Key.openAtLogin) as? Bool ?? true }
-        set { defaults.set(newValue, forKey: Key.openAtLogin) }
-    }
-
     /// True after the first start tried to register the app as a login item. The app tries one time only.
+    /// The app does not store "open at login" itself: the state is in macOS (`LoginItem.isEnabled`).
     public var loginItemWasTried: Bool {
         get { defaults.object(forKey: Key.loginItemWasTried) as? Bool ?? false }
         set { defaults.set(newValue, forKey: Key.loginItemWasTried) }
