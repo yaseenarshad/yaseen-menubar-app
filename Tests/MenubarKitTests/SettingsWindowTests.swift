@@ -71,4 +71,12 @@ import Testing
         model.setOpenAtLogin(true)
         #expect(size().height > withHotKeyLine)
     }
+
+    // S31: macOS can refuse to make an app with no Dock icon active. Then `makeKeyAndOrderFront` leaves the window
+    // behind the other apps, and the user clicks "Settings…" again and again. A test cannot show a real window,
+    // so this one reads the code. A probe on macOS 26.6.2 proved the call: without it the window was behind.
+    @Test func aWindowComesInFrontAlsoWhenTheAppIsNotActive() throws {
+        let source = try #require(try SourceRulesTests.sources().first { $0.name == "ShowInFront.swift" })
+        #expect(source.text.contains("orderFrontRegardless()"))
+    }
 }
