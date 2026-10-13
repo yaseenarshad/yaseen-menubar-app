@@ -138,7 +138,7 @@ final class SettingsModel: ObservableObject {
         // Outside the bundle there is nothing to register. Do not use up the one try there.
         guard loginItem.isAvailable, !store.loginItemWasTried else { return }
         store.loginItemWasTried = true
-        if store.openAtLogin, !loginItem.isEnabled {
+        if !loginItem.isEnabled {
             try? loginItem.setEnabled(true)
         }
         refreshOpenAtLogin()
@@ -154,9 +154,7 @@ final class SettingsModel: ObservableObject {
             loginItemProblem = error.localizedDescription
         }
         refreshOpenAtLogin()
-        if openAtLogin == enabled {
-            store.openAtLogin = enabled
-        } else if loginItemProblem == nil {
+        if openAtLogin != enabled, loginItemProblem == nil {
             // macOS gave no error but the state is not the new one (for example, the user must approve the app).
             loginItemProblem = SettingsModel.loginItemNotChangedText
         }

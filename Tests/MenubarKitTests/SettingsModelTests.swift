@@ -222,13 +222,10 @@ import Testing
 
     // S27: the switch shows the real state from macOS.
     @Test func theSwitchShowsTheRealStateAndGoesBackWhenMacOSRefuses() {
-        let defaults = MemoryDefaults()
-        let store = SettingsStore(defaults: defaults)
         let loginItem = FakeLoginItem()
-        let model = makeModel(defaults, loginItem: loginItem)
+        let model = makeModel(loginItem: loginItem)
 
-        // The stored value tells on (the default), but macOS tells off. The switch shows off.
-        #expect(store.openAtLogin == true)
+        // macOS tells off. The switch shows off.
         #expect(model.openAtLogin == false)
         // A change in System Settings shows after a refresh.
         loginItem.isEnabled = true
@@ -238,7 +235,6 @@ import Testing
         model.setOpenAtLogin(false)
         #expect(loginItem.calls == [false])
         #expect(model.openAtLogin == false)
-        #expect(store.openAtLogin == false)
         #expect(model.loginItemProblem == nil)
 
         // macOS refuses: the switch goes back, and the red line shows the reason.
@@ -246,7 +242,6 @@ import Testing
         model.setOpenAtLogin(true)
         #expect(model.openAtLogin == false)
         #expect(model.loginItemProblem == "Operation not permitted")
-        #expect(store.openAtLogin == false)
 
         // No error, but no change: the switch goes back with a line too.
         loginItem.refuses = false
@@ -260,7 +255,6 @@ import Testing
         model.setOpenAtLogin(true)
         #expect(model.openAtLogin == true)
         #expect(model.loginItemProblem == nil)
-        #expect(store.openAtLogin == true)
     }
 
     // S28.

@@ -14,7 +14,6 @@ import Testing
         withStore { store, _ in
             #expect(store.hideAfterSeconds == 10)
             #expect(store.hotKey == nil)
-            #expect(store.openAtLogin)
             #expect(!store.loginItemWasTried)
             #expect(!store.didFirstStart)
         }
@@ -56,13 +55,11 @@ import Testing
     @Test func aSecondStoreReadsTheSameValues() {
         withStore { store, defaults in
             store.hideAfterSeconds = 30
-            store.openAtLogin = false
             store.loginItemWasTried = true
             store.didFirstStart = true
 
             let second = SettingsStore(defaults: defaults)
             #expect(second.hideAfterSeconds == 30)
-            #expect(!second.openAtLogin)
             #expect(second.loginItemWasTried)
             #expect(second.didFirstStart)
         }
