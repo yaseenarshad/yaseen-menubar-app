@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-/// Rules for all the code of the app: zero permissions, and no timer that repeats (YAZ-2788).
+/// Rules for all the code of the app: zero permissions, and one place that makes a timer (YAZ-2788).
 @Suite struct SourceRulesTests {
     /// The text of each Swift file in `Sources`, found from the path of this file.
     static func sources() throws -> [(name: String, text: String)] {
@@ -28,9 +28,22 @@ import Testing
         }
     }
 
-    @Test func noTimerRepeats() throws {
+    // "No timer while the icons are hidden" has a proof only if each wait goes through `RealClock.schedule`:
+    // the tests give a fake clock in its place and count the waits.
+    @Test func onlyTheClockMakesATimerAndItDoesNotRepeat() throws {
+        let waits = ["Timer.", "Timer(", "DispatchSource", "asyncAfter", "Task.sleep", "afterDelay", "CADisplayLink"]
         for source in try SourceRulesTests.sources() {
-            #expect(!source.text.contains("repeats: true"), "\(source.name) has a timer that repeats")
+            if source.name == "Schedule.swift" {
+                #expect(source.text.contains("repeats: false") && !source.text.contains("repeats: true"))
+            } else {
+                for call in waits {
+                    #expect(!source.text.contains(call), "\(source.name) uses \(call)")
+                }
+            }
+            // The one monitor is for the keys of the settings window. It is local, and the window removes it when it closes.
+            if source.name != "SettingsWindow.swift" {
+                #expect(!source.text.contains("MonitorForEvents"), "\(source.name) adds an event monitor")
+            }
         }
     }
 }
