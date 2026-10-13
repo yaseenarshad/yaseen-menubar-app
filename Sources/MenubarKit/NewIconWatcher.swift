@@ -22,7 +22,9 @@ import AppKit
         self.init(center: NSWorkspace.shared.notificationCenter, schedule: RealClock.schedule)
     }
 
-    var isWaiting: Bool { cancel != nil }
+    deinit {
+        if let observer = observer { center.removeObserver(observer) }
+    }
 
     /// Starts to listen for app launches. A notification costs nothing while no app starts.
     func start() {

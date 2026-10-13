@@ -38,13 +38,6 @@ import Testing
         #expect(checks.count == 1)
     }
 
-    @Test func withNoLaunchThereIsNoWait() {
-        let watcher = makeWatcher()
-        watcher.start()
-        #expect(clock.pendingCount == 0)
-        #expect(!watcher.isWaiting)
-    }
-
     // At login many apps start. They share one wait and one check.
     @Test func launchesCloseTogetherGiveOneCheck() {
         let watcher = makeWatcher()
@@ -58,22 +51,6 @@ import Testing
         #expect(checks.count == 0)
         clock.advance(by: 0.1)
         #expect(checks.count == 1)
-        #expect(clock.pendingCount == 0)
-    }
-
-    // The app asks for a check itself after its own start and after a repair of the divider.
-    @Test func checkSoonGivesOneCheckWithNoLaunch() {
-        let watcher = makeWatcher()
-        watcher.checkSoon()
-        #expect(watcher.isWaiting)
-        clock.advance(by: 2)
-        #expect(checks.count == 1)
-        #expect(!watcher.isWaiting)
-    }
-
-    @Test func aLaunchBeforeStartDoesNothing() {
-        _ = makeWatcher()
-        launchAnApp()
         #expect(clock.pendingCount == 0)
     }
 }

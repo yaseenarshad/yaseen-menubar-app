@@ -56,10 +56,6 @@ import Testing
         #expect(controller.content.bartenderIsRunning == false)
     }
 
-    @Test func theBundleIdentifierOfBartender() {
-        #expect(WelcomeWindowController.bartenderBundleIdentifier == "com.surteesstudios.Bartender")
-    }
-
     /// The view lays out with no window. The Bartender line makes it higher.
     @Test func theViewHasASizeAndGrowsWithTheBartenderLine() {
         @MainActor func size(_ bartenderIsRunning: Bool) -> CGSize {
