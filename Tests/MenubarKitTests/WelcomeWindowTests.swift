@@ -69,7 +69,10 @@ import Testing
 
     @Test func theTextOfTheWindow() {
         #expect(WelcomeView.titleText == "How to hide an icon")
-        #expect(WelcomeView.bodyLines.joined(separator: " ") == "Hold Command and drag an icon. Left of the line: hidden. Right of the arrow: always shows. Click the arrow to hide or show.")
+        #expect(WelcomeView.bodyLines.joined(separator: " ") == "Hold Command and drag an icon. Left of the arrow: hidden. Right of the arrow: always shows. Click the arrow to hide or show.")
+        // One sentence on each line. The text names only the arrow: the user sees no line.
+        #expect(WelcomeView.bodyLines.count == 4)
+        #expect(!WelcomeView.bodyLines.contains { $0.lowercased().contains("line") })
         #expect(WelcomeView.bartenderText == "Bartender is running. Quit Bartender first.")
     }
 }
