@@ -20,7 +20,7 @@ import AppKit
 @MainActor final class BarItems: NSObject, StatusItems {
     static let arrowName = "YMArrow"
     static let dividerName = "YMDivider"
-    /// The arrow lands this far from the right edge of the screen at the first start.
+    /// The saved position of the arrow at the first start. It puts the arrow on the right of the notch.
     static let firstArrowPosition: Double = 420
     /// A divider with a position this much larger lands directly on the left of the arrow.
     static let dividerOffset: Double = 10

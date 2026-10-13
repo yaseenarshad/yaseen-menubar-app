@@ -9,7 +9,21 @@ A small menu bar manager for the Mac. It hides menu bar icons and shows them wit
 - It needs macOS 14 or later on an Apple Silicon Mac.
 - It replaces Bartender.
 
-Status: in development. This version starts and stays open, but the arrow is not in the build yet.
+## How it works
+
+- The app owns two menu bar icons: the arrow and a thin divider on its left.
+- To hide, the app makes the divider 10,000 points long. macOS then pushes each icon on the left of the divider off the screen.
+- A left click on the arrow shows the icons. They hide again after 10 seconds. The app waits while the pointer is in the menu bar or a menu is open.
+- A dot on the arrow tells that a new icon landed on the hidden side.
+- When the app quits or stops, macOS removes the divider and all icons come back.
+- While the icons are hidden, the app runs no timer and watches no input.
+
+## Known limits
+
+- On a display with a notch, the icons that do not fit stay behind the notch, also when all icons show. They fit on an external display.
+- If the shown group has too many icons, the arrow itself can go behind the notch. Move icons to the hidden group, or remove an icon in System Settings > Menu Bar.
+- The app cannot name the icons of other apps. That needs a permission. Thus the dot is an estimate: it shows when the number of hidden icons is higher than before.
+- The app counts 2 seconds after an app starts. It does not see an icon that arrives later.
 
 ## Build
 
