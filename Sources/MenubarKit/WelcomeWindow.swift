@@ -7,7 +7,7 @@ struct WelcomeView: View {
     /// One sentence on each line.
     static let bodyLines = [
         "Hold Command and drag an icon.",
-        "Left of the line: hidden.",
+        "Left of the arrow: hidden.",
         "Right of the arrow: always shows.",
         "Click the arrow to hide or show.",
     ]
@@ -42,7 +42,7 @@ struct WelcomeView: View {
     }
 }
 
-/// A made-up menu bar: the hidden icons, the line, the arrow, and the icons that always show.
+/// A made-up menu bar: the hidden icons, the arrow, and the icons that always show. The arrow is the line between them.
 private struct MenuBarDrawing: View {
     /// The arrow as it is while the icons show. The icons show while the welcome window is open.
     private static let arrowSymbol = "chevron.right"
@@ -51,7 +51,6 @@ private struct MenuBarDrawing: View {
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
             part("Hidden") { icons(["cloud.fill", "bell.fill", "printer.fill"]).foregroundStyle(.tertiary) }
-            part("Line") { Rectangle().frame(width: 1.5, height: 16) }
             part("Arrow") { Image(systemName: MenuBarDrawing.arrowSymbol).fontWeight(.semibold) }
             part("Always shows") { icons(["wifi", "speaker.wave.2.fill", "magnifyingglass"]) }
         }
