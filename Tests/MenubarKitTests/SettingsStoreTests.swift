@@ -3,12 +3,10 @@ import Carbon.HIToolbox
 import Testing
 @testable import MenubarKit
 
-/// The stored settings (YAZ-2801). Each test uses its own `UserDefaults` suite and removes it.
+/// The stored settings (YAZ-2801). Each test uses its own `UserDefaults` in memory, so it leaves no file.
 @Suite struct SettingsStoreTests {
     private func withStore(_ body: (SettingsStore, UserDefaults) -> Void) {
-        let name = "MenubarKitTests.\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defer { defaults.removePersistentDomain(forName: name) }
+        let defaults = MemoryDefaults()
         body(SettingsStore(defaults: defaults), defaults)
     }
 
