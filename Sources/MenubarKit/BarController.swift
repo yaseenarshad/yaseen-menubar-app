@@ -29,6 +29,8 @@ import AppKit
     private var rendered: BarModel?
     private var isStarted = false
     private var startTime: TimeInterval = 0
+    /// True from a repair of the divider until the check that follows it.
+    private var repairIsNotChecked = false
 
     init(
         items: StatusItems,
@@ -93,6 +95,7 @@ import AppKit
                 // A stretched divider on the right of the arrow pushes the arrow off the screen.
                 items.putDividerLeftOfArrow()
                 // The new divider has no frame yet. The check tells if the repair worked.
+                repairIsNotChecked = true
                 watcher.checkSoon()
             } else {
                 // Count before the length changes: the frame of the divider is correct now.
@@ -106,10 +109,16 @@ import AppKit
     /// Runs one time, 2 seconds after an app start, after the start of this app, and after a repair.
     private func check() {
         guard let divider = items.dividerFrame else { return }
+        let followsRepair = repairIsNotChecked
+        repairIsNotChecked = false
         guard let arrow = items.arrowFrame, BarLayout.dividerIsLeftOfArrow(dividerFrame: divider, arrowFrame: arrow) else {
             // The divider is in the menu bar, but the arrow is not on its right. Bring the arrow back.
             // The next hide makes the divider again.
-            if model.isHidden { show() }
+            if model.isHidden {
+                show()
+                // After a repair that did not work, the delay would repair again and again. Only a click hides now.
+                if followsRepair { autoHide.stop() }
+            }
             return
         }
         model.appStarted(hiddenCount: hiddenIconCount(divider), secondsSinceStart: uptime() - startTime)
