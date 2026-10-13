@@ -4,6 +4,9 @@ import AppKit
 @MainActor final class AutoHide {
     /// The time between two checks while the pointer is in the menu bar or a menu is open.
     static let recheckSeconds: TimeInterval = 2
+    /// An open menu holds the icons for this time at most. An app can keep a window at the level of menus
+    /// for hours. Without a limit the icons would never hide, and the checks would never stop.
+    static let longestMenuHoldSeconds: TimeInterval = 60
 
     var onHide: (() -> Void)?
 
@@ -11,6 +14,7 @@ import AppKit
     private let pointerIsInMenuBar: @MainActor () -> Bool
     private let menuIsOpen: @MainActor () -> Bool
     private var cancel: Cancel?
+    private var menuHeldSeconds: TimeInterval = 0
 
     init(
         schedule: @escaping Schedule,
@@ -30,6 +34,7 @@ import AppKit
     /// Starts the delay again. 0 seconds is "Never": no wait.
     func start(seconds: Int) {
         stop()
+        menuHeldSeconds = 0
         if seconds > 0 { wait(TimeInterval(seconds)) }
     }
 
@@ -45,7 +50,10 @@ import AppKit
     private func delayEnded() {
         cancel = nil
         // The user works in the menu bar. A hide now would move the icons under the pointer or close a menu.
-        if pointerIsInMenuBar() || menuIsOpen() {
+        if pointerIsInMenuBar() {
+            wait(AutoHide.recheckSeconds)
+        } else if menuIsOpen(), menuHeldSeconds < AutoHide.longestMenuHoldSeconds {
+            menuHeldSeconds += AutoHide.recheckSeconds
             wait(AutoHide.recheckSeconds)
         } else {
             onHide?()

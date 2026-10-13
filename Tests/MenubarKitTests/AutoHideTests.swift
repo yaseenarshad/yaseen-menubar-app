@@ -97,4 +97,25 @@ import Testing
         #expect(world.hideCount == 0)
         #expect(clock.pendingCount == 0)
     }
+
+    // An app can keep a window at the level of menus for a long time. Then the icons would never hide,
+    // and the delay would check each 2 seconds with no end.
+    @Test func anOpenMenuHoldsTheIconsForOneMinuteAtMost() {
+        let autoHide = makeAutoHide()
+        world.menuIsOpen = true
+        autoHide.start(seconds: 10)
+
+        clock.advance(by: 10 + 58)
+        #expect(world.hideCount == 0)
+        #expect(clock.pendingCount == 1)
+
+        clock.advance(by: 2)
+        #expect(world.hideCount == 1)
+        #expect(clock.pendingCount == 0)
+
+        // The next delay starts with a full minute again.
+        autoHide.start(seconds: 10)
+        clock.advance(by: 10 + 58)
+        #expect(world.hideCount == 1)
+    }
 }

@@ -59,13 +59,13 @@ import Testing
         #expect(model.hotKey == nil)
         #expect(hotKeys.registered == nil)
         #expect(model.hotKeyProblem == nil)
-        #expect(model.hotKeyText == "Record shortcut")
+        #expect(model.hotKeyText == "Record hotkey")
         // A key in the window while the field does not record is not for the model.
         #expect(model.keyDown(controlOptionB) == false)
 
         model.startRecording()
         #expect(model.isRecording)
-        #expect(model.hotKeyText == "Type a shortcut")
+        #expect(model.hotKeyText == "Type a hotkey")
 
         // Only Shift, or no modifier: not accepted, and the field continues to record.
         #expect(model.keyDown(HotKeyCombo(keyCode: UInt32(kVK_ANSI_B), modifiers: .shift)) == true)
@@ -129,7 +129,7 @@ import Testing
         model.startRecording()
         #expect(model.keyDown(commandF6) == true)
         #expect(!model.isRecording)
-        #expect(model.hotKeyProblem == "That shortcut is in use.")
+        #expect(model.hotKeyProblem == "That hotkey is in use.")
         #expect(model.hotKey == nil)
         #expect(hotKeys.registered == nil)
         #expect(SettingsStore(defaults: defaults).hotKey == nil)
@@ -143,7 +143,7 @@ import Testing
         // With an earlier hotkey: it stays, and it listens again.
         model.startRecording()
         #expect(model.keyDown(commandF6) == true)
-        #expect(model.hotKeyProblem == "That shortcut is in use.")
+        #expect(model.hotKeyProblem == "That hotkey is in use.")
         #expect(model.hotKey == controlOptionB)
         #expect(hotKeys.registered == controlOptionB)
         #expect(SettingsStore(defaults: defaults).hotKey == controlOptionB)
@@ -152,7 +152,7 @@ import Testing
         hotKeys.refused = [controlOptionB]
         let atStart = makeModel(defaults, hotKeys: hotKeys)
         atStart.registerHotKey()
-        #expect(atStart.hotKeyProblem == "That shortcut is in use.")
+        #expect(atStart.hotKeyProblem == "That hotkey is in use.")
         #expect(atStart.hotKey == controlOptionB)
     }
 
@@ -166,7 +166,7 @@ import Testing
         model.clearHotKey()
         #expect(model.hotKey == nil)
         #expect(hotKeys.registered == nil)
-        #expect(model.hotKeyText == "Record shortcut")
+        #expect(model.hotKeyText == "Record hotkey")
         #expect(SettingsStore(defaults: defaults).hotKey == nil)
         #expect(defaults.object(forKey: "hotKeyCode") == nil)
         #expect(defaults.object(forKey: "hotKeyModifiers") == nil)
