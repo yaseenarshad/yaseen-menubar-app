@@ -126,14 +126,14 @@ Without the two secrets, the release workflow signs ad-hoc and writes a warning 
 ## The pictures of the README
 
 - The banner, the pictures, and the two GIF files are in `docs/assets/`. `docs/assets/social-preview.png` is the link preview picture. GitHub has no API for it: the owner sets it in Settings, General, Social preview.
-- No picture shows a real screen. The desktop in them is a drawing: a wallpaper, three windows, a Dock, and a menu bar with made-up icons.
+- No picture shows a real screen. Each picture is a drawing of the top of a screen: a large menu bar with made-up menus, made-up icons and a clock, and a plain band of wallpaper below it. There is no window and no Dock, because the app works in the menu bar only.
 - The product in the pictures is the real product. A temporary test file draws each frame, with no window on the screen:
   - The arrow is `BarItems.arrowImage(pointsLeft:hasDot:)`.
   - The state comes from a real `BarController` with a real `BarModel`, `AutoHide`, and `NewIconWatcher`, on a fake clock.
   - The place of each made-up icon comes from `BarModel.dividerLength`.
   - `settings.png` shows the real `SettingsView`, with a drawn window frame around it.
-- The pointer, the rings of a click, the keycap, and the labels are drawn on top. They are not the product.
-- `ffmpeg` joins the frames into the GIF files, with a palette.
+- The pointer, the rings of a click, the keycap, and the labels are drawn on top. They are not the product. In `notch.png`, the top edge of the laptop is also drawn.
+- `ffmpeg` joins the frames into the GIF files, with a palette. The corners of the GIF files are round and clear.
 - The temporary test file is not in the repo. Its source and the GIF script are kept with the work record of the page. Make the pictures again when the look of the app changes.
 - The README states numbers for version 0.1.3: the sizes, the two times, the memory, and the number of tests. Measure them again before you change them.
 

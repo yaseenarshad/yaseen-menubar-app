@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/hero.gif" width="860" alt="A menu bar with fifteen icons. A click on the arrow hides the eleven on its left. A second click shows them. After 10 seconds they hide again with no click.">
+  <img src="docs/assets/hero.gif" width="860" alt="A menu bar with nine icons and one arrow. A click on the arrow hides the six icons on its left. A second click shows them. After 10 seconds they hide again with no click.">
 </p>
 
 <p align="center">
@@ -40,7 +40,7 @@ Maybe you know these moments:
 - The tool that must fix this wants to record your screen.
 
 <p align="center">
-  <img src="docs/assets/notch.png" width="860" alt="A laptop screen with a notch. Nine icons show on the right of the notch. Six more are behind the notch.">
+  <img src="docs/assets/notch.png" width="860" alt="The top edge of a laptop screen with a notch. Six icons show on the right of the notch. Three more are behind the notch.">
 </p>
 
 ## The answer
@@ -64,7 +64,7 @@ Click the arrow, and each icon on its left goes away. Click again, and they come
 **So what:** you see the icons that you use, and the others are one click away.
 
 <p align="center">
-  <img src="docs/assets/clear.png" width="860" alt="Before: fifteen icons in the menu bar. After one click on the arrow: four icons and the arrow.">
+  <img src="docs/assets/clear.png" width="860" alt="Before: nine icons in the menu bar. After one click on the arrow: three icons and the arrow.">
 </p>
 
 ### Choose what stays
