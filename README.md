@@ -1,127 +1,185 @@
-# Yaseen Menubar
+<p align="center">
+  <img src="docs/assets/icon.png" width="128" alt="The app icon: an indigo square with a white Y and a small menu bar">
+</p>
 
-A small menu bar manager for the Mac. It hides menu bar icons and shows them with a click.
+<h1 align="center">Yaseen Menubar</h1>
 
-- An arrow sits in the menu bar. A click on the arrow shows or hides the icons on its left.
-- There is one rule: an icon on the left of the arrow hides, and an icon on the right of the arrow always shows.
-- To change the group of an icon, hold Command and drag the icon across the arrow.
-- The app needs zero permissions: no Accessibility, no Screen Recording.
-- It is a native Swift app. It lives in the menu bar and has no Dock icon.
-- It needs macOS 14 or later on an Apple Silicon Mac.
-- It replaces Bartender.
+<p align="center"><b>A clean Mac menu bar with one click.</b></p>
 
-## Use
+<p align="center">
+  <code>516 KB</code>&nbsp;
+  <code>Zero permissions</code>&nbsp;
+  <code>Open source, MIT</code>&nbsp;
+  <code>macOS 14 or later</code>
+</p>
 
-- A left click on the arrow shows or hides the icons.
-- A right click or a Control-click on the arrow opens a menu: "Settings…", "How to hide an icon", and "Quit Yaseen Menubar".
-- The settings window has three settings:
-  - "Open at login".
-  - "Hide again after": 5 seconds, 10 seconds, 30 seconds, or Never.
-  - "Hotkey": there is none until you record one. The hotkey does the same as a click on the arrow.
-- At the first start, the icons stay shown and a window tells how to hide an icon. The app also registers itself to open at login. The switch in the settings turns that off.
-- At each later start, the app hides the icons at once.
+<p align="center">
+  <a href="https://github.com/yaseenarshad/yaseen-menubar-app/releases/latest"><img src="docs/assets/download-button.png" width="266" alt="Download for Mac"></a>
+</p>
+
+<p align="center">
+  <img src="docs/assets/hero.gif" width="860" alt="A crowded menu bar. A click on the arrow hides the icons on its left. A second click shows them. After 10 seconds they hide again with no click.">
+</p>
+
+<p align="center"><sub>The menu bar in the pictures is an illustration. The two window pictures are real.</sub></p>
+
+## Your menu bar is full
+
+App after app adds an icon to your menu bar. One icon for the chat app. One for the cloud drive. One for the printer. The bar fills up, and the icons you need are lost between the icons you do not need.
+
+On a MacBook with a notch it gets worse. The notch is the black area at the top middle of the screen. Icons that do not fit go behind it. You cannot see them. You cannot click them.
+
+Our test Mac had 24 icons. 8 of them were behind the notch.
+
+<p align="center">
+  <img src="docs/assets/problem.png" width="860" alt="A crowded menu bar on a laptop screen. 8 icons are behind the notch, and 16 more fill the rest of the bar.">
+</p>
+
+## One arrow fixes it
+
+Yaseen Menubar puts one arrow in your menu bar. You choose the icons that stay next to the clock. One click on the arrow hides all the others. One more click shows them.
+
+<p align="center">
+  <img src="docs/assets/before-after.png" width="860" alt="Before: 24 icons, 8 of them behind the notch. After: one arrow and the four icons you use.">
+</p>
 
 ## How it works
 
-- The app owns two menu bar items: the arrow, and a divider directly on its left. The divider shows nothing. You see only the arrow, and an empty gap of 17 points on its left.
-- To hide, the app makes the divider 10,000 points long. macOS then pushes each icon on the left of the divider off the screen.
-- Before each hide, the app checks that the divider touches the arrow. If an icon is between them, the app makes the divider again directly on the left of the arrow. Thus that icon hides too.
-- A left click on the arrow shows the icons. They hide again after a delay, 10 seconds by default. The app waits while the pointer is in the menu bar or a menu is open. An open menu holds the icons for one minute at most.
-- A dot on the arrow tells that a new icon landed on the hidden side.
-- When the app quits or stops, macOS removes the divider and all icons come back.
-- While the icons are hidden, the app runs no timer and watches no input. There is one exception: after an app starts, this app waits 2 seconds one time and then counts the hidden icons.
+### 1. Click the arrow
 
-## Known limits
+The icons on the left of the arrow hide. Click again and they come back.
 
-- On a display with a notch, the icons that do not fit stay behind the notch, also when all icons show. They fit on an external display.
-- If the shown group has too many icons, the arrow itself can go behind the notch. Move icons to the hidden group, or remove an icon in System Settings > Menu Bar.
-- The app cannot name the icons of other apps. That needs a permission. Thus the dot is an estimate: it shows when the number of hidden icons is higher than before.
-- The app counts 2 seconds after an app starts. It does not see an icon that arrives later.
+The arrow tells you the state. It points left while icons are hidden. It points right while they show. It is heavy, so you find it fast.
 
-## Build
+<p align="center">
+  <img src="docs/assets/click.png" width="860" alt="Two states of the menu bar. With the icons showing, the arrow points right. With the icons hidden, the arrow points left. A click goes from one state to the other.">
+</p>
 
-You need Xcode. The package has no outside dependency.
+### 2. Drag an icon to choose its side
 
-- `swift build`: build the app for development.
-- `swift test`: run the unit tests.
-- `MENUBAR_REAL_TEST=1 swift test --filter RealMenuBarTests`: run the one test with the real menu bar. It adds three icons for about 4 seconds and removes them. It uses no mouse and no keyboard. It leaves two empty files in `~/Library/Preferences`: `com.yaseenarshad.yaseenmenubar.realtest.plist` and `swiftpm-testing-helper.plist`.
-- `MENUBAR_UI_PNG_DIR=<folder> swift test --filter WindowPictureTests`: write pictures of the two windows into the folder. No window comes on the screen.
-- `scripts/bundle.sh`: make `build/Yaseen Menubar.app` from a release build and sign it.
-- `scripts/bundle.sh --dmg`: also make `build/Yaseen-Menubar-<version>-arm64.dmg`.
-- `swift scripts/make-icon.swift`: draw the app icon again into `Support/AppIcon.icns`. Run it only after a change to the drawing.
+Hold Command and drag an icon across the arrow.
 
-The version is in one place: `CFBundleShortVersionString` in `Support/Info.plist`.
+- **Left of the arrow:** the icon hides with the others.
+- **Right of the arrow:** the icon always shows.
 
-## Install
+That is the only rule. Command-drag is the normal macOS way to move a menu bar icon, so there is nothing new to learn.
 
-1. Quit Bartender first. Bartender and this app both hide icons. Do not run them together.
-2. Run `scripts/bundle.sh`.
-3. Run `scripts/install.sh`. It quits the old copy, puts the app in `/Applications`, and opens it.
+<p align="center">
+  <img src="docs/assets/drag.gif" width="860" alt="Hold Command. Drag an icon from the right of the arrow to the left of the arrow. Click the arrow. The icon hides with the others.">
+</p>
 
-## The signature
+### 3. Do nothing
 
-`scripts/bundle.sh` signs with the certificate "Yaseen Local Signing". With a fixed certificate, each build is the same app for macOS. Set `SIGN_IDENTITY` to use a different name. Set `REQUIRE_SIGN_IDENTITY=1` to make the script fail when the keychain does not have the certificate.
+After you show the icons, they hide again after 10 seconds. You do not have to tidy up.
 
-If the keychain does not have the certificate, the script signs ad-hoc and prints this:
+The icons do not go away while you use them. The app waits while your pointer is in the menu bar. An open menu holds the icons for one minute at most. You choose the time in the settings.
 
-```
-WARNING: ad-hoc signature. For macOS, each build is then a different app. Run scripts/make-signing-cert.sh one time.
-```
+<p align="center">
+  <img src="docs/assets/autohide.png" width="860" alt="The icons on the left of the arrow hide again after 10 seconds. The choices are 5 seconds, 10 seconds, 30 seconds, and Never.">
+</p>
 
-### Make the certificate (one time on a new Mac)
+One more signal: when a new icon lands on the hidden side, a small dot shows on the arrow.
 
-1. Run `scripts/make-signing-cert.sh`. It makes the self-signed certificate "Yaseen Local Signing" in your login keychain. If the certificate is there already, the script changes nothing.
-2. Check that the keychain has it:
+## Small on purpose
 
-   ```bash
-   security find-identity -p codesigning
-   ```
+The app does one thing. That keeps it small.
 
-   The list must show `"Yaseen Local Signing"`. The text `CSSMERR_TP_NOT_TRUSTED` next to it is normal for a self-signed certificate.
-3. Run `scripts/bundle.sh`. The first time, macOS asks if `codesign` can use the key. Enter your login password and click "Always Allow".
-4. Check the signature:
+| | Yaseen Menubar 0.1.3 | Bartender 6.5.2 |
+| - | - | - |
+| App size | **516 KB** | 81 MB |
+| Preferences file | **190 bytes** | 1.1 MB, with 2,874 old rows |
+| macOS permissions | **None** | Accessibility and Screen Recording |
 
-   ```bash
-   codesign -d -r- "build/Yaseen Menubar.app"
-   ```
+Bartender has many more functions. This app has one. We measured the two apps on the same Mac.
 
-   The output must name a certificate (`certificate leaf = H"…"`). It must not show `cdhash`.
+More numbers from that Mac:
 
-### Give the certificate to GitHub (one time)
+- **Hide: 6.69 ms. Show: 1.01 ms.**
+- **With the icons hidden: 0.0% processor, 36 MB memory.**
+- No Dock icon. No account. No network call.
+- 105 automatic tests pass.
 
-The release workflow signs with the same certificate. It reads two repository secrets.
+<sub>The two times are from version 0.1.1. The other numbers are from version 0.1.3.</sub>
 
-1. Select a password for the `.p12` file. Then export the certificate and its private key:
+## Questions
 
-   ```bash
-   security export -k ~/Library/Keychains/login.keychain-db -t identities -f pkcs12 -P 'YOUR-P12-PASSWORD' -o ~/yaseen-local-signing.p12
-   ```
+### Is it safe?
 
-   This command exports all the identities in the login keychain. If the keychain has other identities, use Keychain Access instead: select "Yaseen Local Signing" in "My Certificates", then File, Export Items, format "Personal Information Exchange (.p12)".
-2. Add the two secrets with the GitHub CLI. Run these commands in the repository folder:
+- The app needs zero macOS permissions: no Accessibility, no Screen Recording.
+- The app makes no network call and needs no account.
+- If the app quits, every icon comes back.
+- The app is open source under the MIT licence. The source is public and anyone can read it: [`Sources/MenubarKit`](Sources/MenubarKit).
 
-   ```bash
-   base64 -i ~/yaseen-local-signing.p12 | gh secret set SIGN_CERT_P12_BASE64
-   gh secret set SIGN_CERT_PASSWORD
-   ```
+### What about the notch?
 
-   The second command asks for the value. Paste the password of the `.p12` file.
-3. Delete the file:
+The app does not make the menu bar wider. On a laptop screen with a notch, the icons that do not fit stay behind the notch, also when you show all icons. They fit on an external display.
 
-   ```bash
-   rm ~/yaseen-local-signing.p12
-   ```
+What you get: the icons on the right of the arrow stay in view. Keep that group small. With too many icons on the right, the arrow itself can go behind the notch.
 
-Without the two secrets, the release workflow signs ad-hoc and writes a warning in its log.
+### Can an icon never show?
 
-## Releases
+Not with this app. It has two sides only: hidden, and always shows. For an icon that must never show, use System Settings > Menu Bar > "Allow in the Menu Bar".
 
-- No release is cut automatically.
-- Set the new version in `Support/Info.plist` (`CFBundleShortVersionString`) and merge it into `main`.
-- Tag that commit `vX.Y.Z` and push the tag. `.github/workflows/release.yml` builds the `.dmg` and attaches it to the GitHub release of that tag. It makes the release if it does not exist.
-- The workflow fails if the tag is not the version in `Support/Info.plist`.
-- `.github/workflows/ci.yml` runs `swift build` and `swift test` on each pull request.
+### macOS says it cannot open the app
 
-## Origin
+The download has no Apple notarization. Go to System Settings > Privacy & Security and click "Open Anyway". You do this one time.
 
-The package layout, the scripts, and the workflows come from the Yaseen Screenshot app.
+### Where are the settings?
+
+Right-click the arrow. The menu has three rows: "Settings…", "How to hide an icon", and "Quit Yaseen Menubar". The settings window has three settings, no more.
+
+<p align="center">
+  <img src="docs/assets/settings.png" width="530" alt="The settings window: Open at login, Hide again after, and Hotkey with the button Record hotkey">
+</p>
+
+<p align="center"><sub>The full settings window. In this picture, "Open at login" is off.</sub></p>
+
+### Does it start at login?
+
+Yes. At the first start, the app sets itself to open at login. The switch "Open at login" turns that off.
+
+### Is there a hotkey?
+
+It is optional. There is none until you record one. Click "Record hotkey" in the settings and press the keys. The hotkey does the same as a click on the arrow.
+
+## Get it
+
+1. Quit Bartender, or any other menu bar manager. Do not run two of them together.
+2. Download the DMG from the [latest release](https://github.com/yaseenarshad/yaseen-menubar-app/releases/latest).
+3. Open the DMG. Drag Yaseen Menubar to Applications.
+4. Open the app. If macOS refuses, see ["macOS says it cannot open the app"](#macos-says-it-cannot-open-the-app).
+5. The arrow comes in the menu bar. A window shows the one rule.
+
+<p align="center">
+  <img src="docs/assets/welcome.png" width="490" alt="The window at the first start. Hold Command and drag an icon. Left of the arrow: hidden. Right of the arrow: always shows. Click the arrow to hide or show.">
+</p>
+
+<p align="center">
+  <a href="https://github.com/yaseenarshad/yaseen-menubar-app/releases/latest"><img src="docs/assets/download-button.png" width="266" alt="Download for Mac"></a>
+</p>
+
+<p align="center">The app needs macOS 14 or later on an Apple Silicon Mac.</p>
+
+## Status and limits
+
+This is an early version: 0.1.3.
+
+- **Built for:** macOS 14 or later on Apple Silicon.
+- **Tested on:** one Mac, with macOS 26.
+- **Checked on that Mac:** hide and show, the drag, the right-click menu, and the settings window.
+- **Not checked yet on a real Mac:** the hotkey, open at login after a restart, and the dot.
+
+Limits:
+
+- **The notch:** on a laptop screen with a notch, the icons that do not fit stay behind the notch, also when all icons show. See ["What about the notch?"](#what-about-the-notch).
+- **The dot:** it is an estimate.
+
+If something does not work on your Mac, [open an issue](https://github.com/yaseenarshad/yaseen-menubar-app/issues).
+
+## For developers
+
+How to build, test, sign, and release the app, and how it works inside: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
